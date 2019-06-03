@@ -1,7 +1,7 @@
 version: "2"
 services:
   antidote1:
-     image: antidotedb/antidote:latest
+     image: antidotedb/antidote:stable
      ports:
        - "8087:8087"
      environment:
@@ -14,7 +14,7 @@ services:
        - local1
 
   antidote2:
-    image: antidotedb/antidote:latest
+    image: antidotedb/antidote:stable
     ports:
       - "8088:8087"
     environment:
@@ -46,6 +46,20 @@ services:
     cap_add:
       - NET_ADMIN
     networks:
+      - local2
+
+  server_tutorial:
+    image: java:8
+    volumes:
+      - ../bookstore/build/libs:/code
+    command: "java -jar bookstore.jar -t"
+    working_dir: /code
+    environment:
+      - ANTIDOTE_TUTORIAL_SAVE=0
+    cap_add:
+      - NET_ADMIN
+    networks:
+      - local1
       - local2
 
   link:

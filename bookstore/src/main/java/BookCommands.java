@@ -1,18 +1,32 @@
 import java.util.List;
 
 import eu.antidotedb.client.*;
-
-import static eu.antidotedb.client.Key.register;
-
+import java.net.InetSocketAddress;
 
 public class BookCommands {
 
-	String userBucket = "userbucket";
+  public static String userBucket = "userbucket";
 
-	private static final RegisterKey<String> emailMapField = register("email");
-	private static final SetKey<String> ownBooksMapField = Key.set("ownbooks");
-	private static final SetKey<String> borrowedBooksMapField = Key.set("borrowedbooks");
-			
+  public static final RegisterKey<String> emailMapField = Key.register("email");
+  public static final SetKey<String> ownBooksMapField = Key.set("ownbooks");
+  public static final SetKey<String> borrowedBooksMapField = Key.set("borrowedbooks");
+
+  public AntidoteClient connect(String host, int port) {
+    return new AntidoteClient(new InetSocketAddress(host, port));
+  }
+
+  public void assignToRegister(AntidoteClient client, String bucket, String key, String value) {
+    Bucket buck = Bucket.bucket(bucket);
+    RegisterKey<String> reg = Key.register(key);
+    buck.update(client.noTransaction(), reg.assign(value));
+  }
+
+  public void updateMapRegister(AntidoteClient client, String bucket, String key, String mapKey, String value) {
+    Bucket buck = Bucket.bucket(bucket);
+    MapKey map = Key.map_rr(key);
+    buck.update(client.noTransaction(), map.update(Key.register(mapKey).assign(value)));
+  }
+
 	public void getUserInfo(AntidoteClient client, String username){
 		System.out.println("User: " + username);
 		System.out.println("Email: " + getEmail(client, username));
